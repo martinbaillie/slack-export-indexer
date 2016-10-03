@@ -14,13 +14,17 @@ Tested with the Elastic v5-alpha products (ElasticSearch, Kibana, Marvel) and sh
 `TODO`: Performance benchmarking of Conduit vector sizing with ElasticSearch Marvel
 
 ## Developing
+
 ##### Status
 `TODO`: Travis, Dockerhub
+
 ##### Pre-requisite: [Stack](https://www.haskellstack.org)
 > Attention: always check the source before piping from curl to your shell!
+
 ```bash
 curl -sSL https://get.haskellstack.org/ | sh
 ```
+
 ##### Build
 ```bash
 stack setup
@@ -28,9 +32,9 @@ stack build
 stack install
 ~/.local/bin/slack-export-indexer
 ```
+
 ## Deploying :whale:
 `TODO`: Rancher & Docker compose. Crond and Slack admin scraping
 
 ## Configuration
 `TODO`
-
