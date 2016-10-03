@@ -1,0 +1,34 @@
+elasticsearch:
+  image: elasticsearch:5
+  container_name: elasticsearch
+  hostname: elasticsearch
+  environment:
+    es.logger.level: DEBUG
+    ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+  volumes:
+    - ${PWD}/eldata:/usr/share/elasticsearch/data
+  ports:
+   - 9200:9200
+   - 9300:9300
+
+kibana:
+  image: kibana:5
+  container_name: kibana
+  hostname: kibana
+  links:
+    - elasticsearch
+  ports:
+    - 5601:5601
+
+kopf:
+  image: lmenezes/elasticsearch-kopf
+  environment:
+    KOPF_ES_SERVERS: 'elasticsearch:9200'
+    KOPF_SERVER_NAME: kopf
+    KOPF_THEME: light
+  container_name: kopf
+  hostname: kopf 
+  links:
+    - elasticsearch:elasticsearch
+  ports:
+    - 80:80
