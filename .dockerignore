@@ -1,3 +1,6 @@
 .git
 .gitignore
 .stack-work
+Dockerfile
+Makefile
+*-compose.yml
