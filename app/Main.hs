@@ -48,7 +48,6 @@ import              System.IO.Temp                  (withSystemTempDirectory)
 import              Slack
 import              Database.Bloodhound
 
-
 --------------------------------------------------------------------------------
 --  ElasticSearch functions
 
@@ -58,12 +57,15 @@ esIndexSettings   = IndexSettings (ShardCount 5) (ReplicaCount 1)
 esMapping         = MappingName "events"
 es                = withBH defaultManagerSettings esServer
 
+-- | Indexes a vector of ops to ElasticSearch via the bulk index API
+-- | Exponentially backs off on exception
 esBulkIndex
     :: MonadTrans mt
     => Vector BulkOperation
     -> mt IO ()
 esBulkIndex ops = lift . void . backingOffRetry . es $ bulk ops
 
+-- | Encodes an ElasticSearch doc with deterministic ids from the SlackEvent
 esMakeDoc
     :: SlackEvent
     -> (DocId, Value)
@@ -74,11 +76,12 @@ esMakeDoc event = (genDocId event, toJSON event) where
                            , confCompare = compare
                            , confNumFormat = Generic }
 
+-- | A backing off retry combinator for the ElasticSearch calls
 backingOffRetry
     :: IO a
     -> IO a
 backingOffRetry req = recovering policy [handler] retryStatus where
-    -- exponential backoff: 10 attempts starting at a 1 second delay
+    -- Exponential backoff: 10 attempts starting at a 1 second delay
     policy          = exponentialBackoff (1 ^ (6 :: Integer)) <> limitRetries 10
     handler _       = Handler $ \(_ :: HttpException) -> return True
     retryStatus rs  = do
@@ -86,17 +89,18 @@ backingOffRetry req = recovering policy [handler] retryStatus where
         putStrLn "Making request..."
         req
 
-
 --------------------------------------------------------------------------------
 --  Conduit pipeline
 
+-- | Conduit for producing SlackEvents downstream
 slackEventParsingConduit
   :: ConduitM FilePath SlackEvent (ResourceT IO) ()
 slackEventParsingConduit = awaitForever $
     maybe (return ()) (\cms ->
-        C.yieldMany $ map (slackEvent $ fst cms) (snd cms))
+        C.yieldMany $ map (mkSlackEvent $ fst cms) (snd cms))
     <=< liftIO . parseSlackChanMsgFile
 
+-- | The guts of this little CLI tool
 index
     :: FilePath
     -> IO ()
@@ -113,12 +117,12 @@ index file = withSystemTempDirectory "slack-export" (\dir -> do
                 $ C.sourceDirectoryDeep False "."
                   =$& C.filter (not . nonSlackMsgFile)
                   =$& slackEventParsingConduit
-                  =$& C.map (convertSlackUserIdsWith users)
+                  =$& C.map (enrichSlackEventWithUserNames users)
                   =$& C.map esMakeDoc
                   =$& C.map (uncurry $ BulkIndex esIndex esMapping)
                   =$& C.conduitVector 1000
                   $$& C.mapM_ esBulkIndex)
-                  {-$$& C.mapM_ (liftIO . putStrLn . unpack . _username ))-}
+                  {-$$& C.mapM_ (liftIO . putStrLn . unpack . _message ))-}
 
 main
     :: IO ()
@@ -127,7 +131,7 @@ main = do
     -- TODO: Flags for index names, ES bulk vector, exponential backoff tuning
     files <- getArgs
     -- TODO: Error handling and CLI help
-    allPresent <- foldr (&&) True <$> mapM doesFileExist files
+    allPresent <- and <$> mapM doesFileExist files
     if allPresent 
        then mapM index files
        else error "Some files to not exist"

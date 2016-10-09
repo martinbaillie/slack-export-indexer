@@ -21,6 +21,10 @@ library
                      , text
                      , filepath
                      , bytestring
+
+                     , unordered-containers
+                     , vector
+                     , regex-compat-tdfa
   default-language:    Haskell2010
 
 executable slack-export-indexer
