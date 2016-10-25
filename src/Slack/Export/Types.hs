@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack
+module Slack.Export.Types
     ( SlackEvent(..)
     , SlackUsers
     , SlackMapping(..)
@@ -13,7 +13,7 @@ module Slack
     , parseSlackChanMsgFile
 
     , enrichSlackEventWithUserNames
-    , nonSlackMsgFile
+    , isSlackMsgFile
     ) where
 
 import              Control.Monad               ((>>=), mzero)
@@ -94,16 +94,15 @@ $(deriveJSON defaultOptions
 --------------------------------------------------------------------------------
 --  Loosely related Slack functions
 
--- | File paths not matching Slack message filename format
-nonSlackMsgFile
+-- | File paths matching Slack message filename format
+isSlackMsgFile
     :: FilePath
     -> Bool
-nonSlackMsgFile p = let f = takeFileName p in
-                        head f == '.' ||
-                        not (".json" `isSuffixOf` f) ||
-                        elem f [ "users.json"
-                               , "channels.json"
-                               , "integration_logs.json" ]
+isSlackMsgFile p = let f = takeFileName p in
+                        head f /= '.' &&
+                        ".json" `isSuffixOf` f &&
+                        (not $ f `elem`
+                        ["users.json","channels.json","integration_logs.json"])
 
 -- | Decode an individual Slack message file
 parseSlackMsgFile

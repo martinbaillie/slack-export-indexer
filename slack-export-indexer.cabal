@@ -15,16 +15,33 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Slack
+  exposed-modules:     Slack.Export.Indexer
+                       Slack.Export.Types
+                       Slack.Export.Opts
   build-depends:       base
                      , aeson
-                     , text
-                     , filepath
+                     , aeson-pretty
+                     , bloodhound
                      , bytestring
-
+                     , conduit
+                     , conduit-combinators
+                     , directory
+                     , exceptions
+                     , filepath
+                     , http-client
+                     , optparse-applicative
+                     , optparse-text
+                     , regex-compat-tdfa
+                     , resourcet
+                     , retry
+                     , SHA
+                     , stm-conduit
+                     , temporary
+                     , text
+                     , transformers
                      , unordered-containers
                      , vector
-                     , regex-compat-tdfa
+                     , zip-archive
   default-language:    Haskell2010
 
 executable slack-export-indexer
@@ -33,25 +50,7 @@ executable slack-export-indexer
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , slack-export-indexer
-                     , aeson
-                     , aeson-pretty
-                     , bloodhound
-                     , http-client
-                     , transformers
-                     , conduit
-                     , conduit-combinators
-                     , stm-conduit
-                     , resourcet
-                     , SHA
-                     , retry
-                     , vector
-                     , text
-                     , exceptions
-                     , directory
-
-                     , zip-archive
-                     , temporary
-                     , bytestring
+                     , optparse-applicative
 
   default-language:    Haskell2010
 
