@@ -21,20 +21,19 @@ install:
   - stack +RTS -N2 -RTS build --only-snapshot
 
 script:
-  - stack --version
   - stack +RTS -N2 -RTS build --test
+
+before_deploy:
   - zip slack-export-indexer-linux-x86_64.zip $(stack path --local-install-root)/bin/slack-export-indexer
 
-notifications:
-  email: true
-
 deploy:
+  skip_cleanup: true
   provider: releases
   api_key:
     secure: T4FNp6qnGFBihMV9cllu21TWLEE1qCffFhlWlYLatl3j8ow/1izJMnIZ8Dikr0Yw1+DVrTX4SpfpjsKi78ghzvWU4jNU2R99CZEtMidUvzzeJ7rL79QoHapocpCVrpBDREIwy+edQgxhDmPB6HRLA47D7TKbHT36yDBZLEOTOMHirDIBNoQ5Fal9zWdTkumT1C7fQJD76Z/YqNJROSwt1foTzNFfpBJujo0WXWoqhyDj6j7l077tAWTMqX/IxztetlMTPmwkZE3rD6uTHf58hJlxxt7UOCet7oR3tkiiTwq7IZkGss/NDo97NwcidVYjh3AxIdfiG36/5C05riCZPfT3W7x9E0/1k+PrVOjoBg2hTfLJhCqCWIHMyUJzOfxIyORSiFenSTlccJ/D+oAwkXN0aCqJ6k2e5wL3Z8btTjS/Qsv2mcEqx8Fbqk3t9aIy27XhkruELUqGrZtF0joY27S0IDJ/yCbOMdShiFWEL8wUuJbYHHiaxy25X/tL/UPAR3Q5Xcb6pquW13ZBLWunBYirxG9q0aVG4NJCIoUnLdDZlYt33v4oqwA1SF/Gq7dmkDvjY4+qb5bpKrsKAiWDwizthktPifF43gRO2bFJCfO8UI19CygVha8DTr0CpM0nDwYyTfS77yipH2RHuFzbuskbpu+h575Mo8jGil6IllY=
   file: slack-export-indexer-linux-x86_64.zip
   on:
     tags: true
-  #on:
-    #repo: martinbaillie/slack-export-indexer
-    #branch: develop
+
+notifications:
+  email: true
