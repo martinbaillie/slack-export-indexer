@@ -1,8 +1,9 @@
 # slack-export-indexer
 > Parses Slack export archives into an ElasticSearch index for exploring with Kibana
 
-[![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)][Haskell.org]
+[![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)](https://www.haskell.org)
 [![Build Status](https://travis-ci.org/martinbaillie/slack-export-indexer.svg?branch=master)](https://travis-ci.org/martinbaillie/slack-export-indexer)
+[![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/martinbaillie/slack-export-indexer)
 
 [Haskell.org]:
   http://www.haskell.org
@@ -15,9 +16,6 @@ Tested with the Elastic v5-alpha products (ElasticSearch, Kibana, Marvel) and sh
 `TODO`: Performance benchmarking of Conduit vector sizing with ElasticSearch Marvel
 
 ## Developing
-
-##### Status
-`TODO`: Dockerhub
 
 ##### Pre-requisite: [Stack](https://www.haskellstack.org)
 > Attention: always check the source before piping from curl to your shell!
