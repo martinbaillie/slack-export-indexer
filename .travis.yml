@@ -1,9 +1,6 @@
 language: haskell
 
-branches:
-  only:
-    - master
-    - develop
+all_branches: true
 
 cache:
   directories:
